@@ -17,11 +17,15 @@ workspace "Помощник архитектора" "Система рекоме
                     user -> this "Запрос на веб-интерфейс" "HTTP:443"
                 }
             }
+            api_gw = container "Api Gateway" {
+                technology envoyLLM
+                arch_helper.front.browser -> this "Конфигурация предпочтений" "HTTP:443"
+            }
             back = container "Бэкенд" {
                 technology Java
                 api = component "Конфигуратор" "Конфигуратор предпочтений пользователя" {
                     technology Java
-                    arch_helper.front.browser -> this "Конфигурация предпочтений" "HTTP:443"
+                    arch_helper.api_gw -> this "Конфигурация предпочтений" "HTTP:443"
                 }
             }
             crawler = container "Краулер по arXiv для поиска статей" {
@@ -42,7 +46,7 @@ workspace "Помощник архитектора" "Система рекоме
                 job = component "Рекомендатель" "Агент для раздачи рекомендаций по найденным статьям" {
                     technology Java
                     this -> inference_provider "Обращение во внешнюю нейросеть"
-                    this -> arxiv "Получение статей" "HTTP:443"
+                    // this -> arxiv "Получение статей" "HTTP:443"
                 }
             }
             email_sender = container "Коммуникатор" {
@@ -68,12 +72,14 @@ workspace "Помощник архитектора" "Система рекоме
                     arch_helper.recommendations.job -> this "Публикация событий рекомендаций" "TCP:9093"
                     arch_helper.email_sender.job -> this "Подписка событий рекомендаций" "TCP:9093"
                 }
-                crawler -> this "Публикация рекомендаций"
-                email_sender -> this "Подписка на рекомендации"
             }
             file_storage = container "Хранилище статей для анализа" {
                 technology S3
                 crawler -> this "Сохранение файлов"
+                component "Статьи" "Бакет для статей" {
+                    arch_helper.crawler.job -> this "Запись новых найденных статей" "TCP:443"
+                    arch_helper.recommendations.serverless -> this "Чтение найденных статей" "TCP:443"
+                }
             }
             consistent_storage = container "БД предпочтений" {
                 technology PostgreSQL
@@ -104,27 +110,27 @@ workspace "Помощник архитектора" "Система рекоме
             autoLayout
         }
 
-        component arch_helper.front "Фронт" {
+        component arch_helper.front "Front" {
             include *
             autoLayout
         }
 
-        component arch_helper.back "Бэк" {
+        component arch_helper.back "Back" {
             include *
             autoLayout
         }
 
-        component arch_helper.crawler "Краулер" {
+        component arch_helper.crawler "Crawler" {
             include *
             autoLayout
         }
 
-        component arch_helper.recommendations "Харнес" {
+        component arch_helper.recommendations "Harness" {
             include *
             autoLayout
         }
 
-        component arch_helper.email_sender "Отпрака почты" {
+        component arch_helper.email_sender "Sender" {
             include *
             autoLayout
         }
