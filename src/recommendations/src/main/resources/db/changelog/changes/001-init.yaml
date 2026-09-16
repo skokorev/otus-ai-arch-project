@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: SKokorev
+      changes:
+        - createTable:
+            tableName: sets
+            columns:
+              - column:
+                  name: id
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: articles
+            columns:
+              - column:
+                  name: id
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: published
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: abstract
+                  type: text
+              - column:
+                  name: title
+                  type: text
+        - createTable:
+            tableName: article_set_mapping
+            columns:
+              - column:
+                  name: article_id
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: set_id
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
