@@ -16,5 +16,8 @@
 
     <modules>
         <module>src/recommendations</module>
+        <module>src/crawler</module>
+        <module>src/commons</module>
+        <module>src/communicator</module>
     </modules>
 </project>

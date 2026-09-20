@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+Новый сборник интересных статей, собранный Яхундекс
+
+<div th:each="set : ${sets}">
+    <h3 th:text="${set.name}" />
+    <ul>
+        <div th:each="rec : ${set.recs}">
+            <a th:href="${rec.url}"><li th:text="rec.title" /></a>
+        </div>
+
+    </ul>
+</div>
+</body>
+</html>

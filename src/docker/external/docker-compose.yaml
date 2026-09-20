@@ -1,0 +1,8 @@
+services:
+  vault:
+    container_name: "dev-vault"
+    image: hashicorp/vault:2.1.1
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "79e50284-0d7c-409a-92fa-4316c6f5fd8d"
+    ports:
+      - "8200:8200"

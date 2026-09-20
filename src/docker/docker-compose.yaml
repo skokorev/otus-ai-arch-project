@@ -1,0 +1,36 @@
+services:
+  postgres:
+    container_name: "common-db"
+    image: postgres:17
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: defdb
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d defdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+  pgadmin:
+    container_name: "pgadmin"
+    image: dpage/pgadmin4:9.18.0
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@yahoondex.ru
+      PGADMIN_DEFAULT_PASSWORD: SuperSecret
+    ports:
+      - "8432:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
+    driver: local

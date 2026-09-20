@@ -52,4 +52,18 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
-
+        - createTable:
+            tableName: group_sets
+            columns:
+              - column:
+                  name: group_id
+                  type: varchar(40)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: set_id
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
