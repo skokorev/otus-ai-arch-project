@@ -7,5 +7,6 @@ import ru.yahoondex.archhelper.communicator.repositories.dao.UserGroupId;
 import java.util.List;
 
 public interface UsersRepository extends JpaRepository<UserDao, UserGroupId> {
-    public List<UserDao> findAllByGroupId(String groupId);
+    List<UserDao> findAllByGroupId(String groupId);
+    List<UserDao> findAllByEmail(String email);
 }

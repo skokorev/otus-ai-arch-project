@@ -12,8 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import ru.yahoondex.archhelper.recommendations.ai.tools.CustomTools;
 
-import java.nio.charset.StandardCharsets;
-
 @Configuration
 @ComponentScan(basePackages = {"ru.yahoondex.archhelper.recommendations.ai.tools"})
 @EnableConfigurationProperties(VaultConfigurationProperties.class)
