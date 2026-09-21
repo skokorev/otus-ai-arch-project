@@ -6,3 +6,60 @@ services:
       VAULT_DEV_ROOT_TOKEN_ID: "79e50284-0d7c-409a-92fa-4316c6f5fd8d"
     ports:
       - "8200:8200"
+
+  postgres:
+    container_name: Postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: keycloak
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5435:5432
+    networks:
+      - keycloak-network
+    restart: unless-stopped
+
+  keycloak:
+    container_name: Keycloak
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - 9090:8080
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_SCHEMA: public
+      DB_USER: root
+      DB_PASSWORD: root
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - keycloak-network
+    depends_on:
+      - postgres
+    command:
+      - "start-dev"
+
+  grafana-lgtm:
+    image: grafana/otel-lgtm:0.33.1
+    ports:
+      - 3000:3000
+      - 3200:3200
+      - 4040:4040
+      - 4317:4317
+      - 4318:4318
+      - 9090:9090
+
+
+networks:
+  keycloak-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  keycloak:
+    driver: local

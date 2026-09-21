@@ -19,5 +19,6 @@
         <module>src/crawler</module>
         <module>src/commons</module>
         <module>src/communicator</module>
+        <module>src/configurator</module>
     </modules>
 </project>

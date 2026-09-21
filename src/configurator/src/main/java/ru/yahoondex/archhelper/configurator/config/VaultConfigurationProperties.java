@@ -10,4 +10,6 @@ public class VaultConfigurationProperties {
     private String postgresUser;
     @Getter @Setter
     private String postgresPassword;
+    @Getter @Setter
+    private String clientSecret;
 }
