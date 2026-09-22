@@ -1,7 +1,6 @@
 package ru.yahoondex.archhelper.configurator.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import ru.yahoondex.archhelper.configurator.controllers.dto.Group;
 import ru.yahoondex.archhelper.configurator.services.GroupService;
@@ -26,7 +25,7 @@ public class AdminController {
     }
 
     @GetMapping(path = "/groups/{id}")
-    public Group getGroup(@Param("id") String id) {
+    public Group getGroup(@PathVariable("id") String id) {
         return groupService.getGroup(id);
     }
 
@@ -41,27 +40,27 @@ public class AdminController {
     }
 
     @DeleteMapping(path = "/groups/{id}")
-    public void deleteGroup(@Param("id") String id) {
+    public void deleteGroup(@PathVariable("id") String id) {
         groupService.deleteGroup(id);
     }
 
     @PostMapping(path = "/groups/{id}/set")
-    public void addNameSet(@Param("id") String groupId, String setId) {
+    public void addNameSet(@PathVariable("id") String groupId, String setId) {
         groupService.addNameSet(groupId, setId);
     }
 
     @DeleteMapping(path = "/groups/{id}/set/{setId}")
-    public void deleteNameSet(@Param("id") String groupId, @Param("setId") String setId) {
+    public void deleteNameSet(@PathVariable("id") String groupId, @PathVariable("setId") String setId) {
         groupService.deleteNameSet(groupId, setId);
     }
 
     @PostMapping(path = "/groups/{id}/users")
-    public void addUser(@Param("id") String id, String email) {
+    public void addUser(@PathVariable("id") String id, String email) {
         groupService.addUser(id, email);
     }
 
     @DeleteMapping(path = "/groups/{id}/users")
-    public void removeUser(@Param("id") String id, String email) {
-
+    public void removeUser(@PathVariable("id") String id, String email) {
+        groupService.removeUser(id, email);
     }
 }

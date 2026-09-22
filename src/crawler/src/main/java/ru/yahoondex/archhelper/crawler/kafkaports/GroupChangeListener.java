@@ -20,7 +20,7 @@ public class GroupChangeListener {
     }
 
     @KafkaListener(topics = {"group-topic"},
-            groupId = "recommendations",
+            groupId = "crawler",
             containerFactory = "groupConcurrentKafkaListenerContainerFactory"
     )
     @Transactional

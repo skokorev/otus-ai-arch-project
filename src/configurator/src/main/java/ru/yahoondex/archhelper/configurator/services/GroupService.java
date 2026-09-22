@@ -65,7 +65,7 @@ public class GroupService {
         final String id = UUID.randomUUID().toString();
         ru.yahoondex.archhelper.configurator.repositories.dao.Group group = new ru.yahoondex.archhelper.configurator.repositories.dao.Group(id, name);
         groupRepository.save(group);
-        groupTemplate.sendDefault(id, new GroupDto(id, name, new String[]{}, Operation.CREATE));
+        groupTemplate.send("group-topic", id, new GroupDto(id, name, new String[]{}, Operation.CREATE));
     }
 
     @Transactional
@@ -77,7 +77,7 @@ public class GroupService {
         groupRepository.findById(groupId).ifPresent(g -> {
             groupRepository.save(new ru.yahoondex.archhelper.configurator.repositories.dao.Group(g.getId(), g.getName()));
             String[] setIds = groupSetRepository.findAllByGroupId(groupId).stream().map(GroupSet::getSetId).toArray(String[]::new);
-            groupTemplate.sendDefault(groupId, new GroupDto(groupId, newName, setIds, Operation.UPDATE));
+            groupTemplate.send("group-topic", groupId, new GroupDto(groupId, newName, setIds, Operation.UPDATE));
         });
     }
 
@@ -89,7 +89,7 @@ public class GroupService {
         }
         groupSetRepository.deleteAllByGroupId(groupId);
         groupRepository.deleteById(groupId);
-        groupTemplate.sendDefault(groupId, new GroupDto(groupId, null, new String[] {}, Operation.DELETE));
+        groupTemplate.send("group-topic", groupId, new GroupDto(groupId, null, new String[] {}, Operation.DELETE));
     }
 
     @Transactional
@@ -107,7 +107,7 @@ public class GroupService {
             if (setIds.stream().noneMatch(setId::equals)) {
                 setIds.add(setId);
                 groupSetRepository.save(new GroupSet(groupId, setId));
-                groupTemplate.sendDefault(groupId, new GroupDto(groupId, group.getName(), setIds.toArray(String[]::new), Operation.UPDATE));
+                groupTemplate.send("group-topic", groupId, new GroupDto(groupId, group.getName(), setIds.toArray(String[]::new), Operation.UPDATE));
             }
         }, () -> {
             log.debug("Group {} not found", groupId);
@@ -129,7 +129,7 @@ public class GroupService {
             if (setIds.stream().anyMatch(setId::equals)) {
                 groupSetRepository.deleteById(new GroupSetId(groupId, setId));
                 setIds.removeIf(setId::equals);
-                groupTemplate.sendDefault(groupId, new GroupDto(groupId, group.getName(), setIds.toArray(String[]::new), Operation.UPDATE));
+                groupTemplate.send("group-topic", groupId, new GroupDto(groupId, group.getName(), setIds.toArray(String[]::new), Operation.UPDATE));
             }
         }, () -> {
             log.debug("Group {} not found", groupId);
@@ -147,11 +147,11 @@ public class GroupService {
             return;
         }
         final List<UserGroup> userGroups = userGroupRepository.findAllByEmail(email);
-        if (userGroups.stream().noneMatch(g -> email.equals(g.getEmail()))) {
+        if (userGroups.stream().noneMatch(g -> groupId.equals(g.getGroupId()))) {
             userGroupRepository.save(new UserGroup(groupId, email));
             List<String> groupIds = new LinkedList<>(userGroups.stream().map(UserGroup::getGroupId).collect(Collectors.toList()));
             groupIds.add(groupId);
-            userTemplate.sendDefault(groupId, new UserDto(email, groupIds.toArray(String[]::new), Operation.UPDATE));
+            userTemplate.send("user-topic", groupId, new UserDto(email, groupIds.toArray(String[]::new), Operation.UPDATE));
         }
     }
 
@@ -170,7 +170,7 @@ public class GroupService {
             List<String> groupIds = new LinkedList<>(userGroups.stream().map(UserGroup::getGroupId).collect(Collectors.toList()));
             groupIds.removeIf(groupId::equals);
             userGroupRepository.deleteById(new UserGroupId(groupId, email));
-            userTemplate.sendDefault(groupId, new UserDto(email, groupIds.toArray(String[]::new), Operation.UPDATE));
+            userTemplate.send("user-topic", groupId, new UserDto(email, groupIds.toArray(String[]::new), Operation.UPDATE));
         }
     }
 }

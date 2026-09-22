@@ -17,8 +17,8 @@ public class NameSetListener {
     }
 
     @KafkaListener(topics = {"set-topic"},
-            groupId = "recommendations",
-            containerFactory = "nameSetConcurrentKafkaListenerContainerFactory"
+            groupId = "mail-sender",
+            containerFactory = "setListenerContainerFactory"
     )
     @Transactional
     public void listen(NameSetDto data) {

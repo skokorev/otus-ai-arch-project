@@ -57,22 +57,24 @@ public class ArxivService {
                     .collect(Collectors.toMap(NameSet::getId, NameSet::getName));
             final Map<String, String> futureSets = ArxivSetHelper.getNameSets(result)
                     .stream()
+                    .distinct()
                     .collect(Collectors.toMap(NameSet::getId, NameSet::getName));
             futureSets.forEach((id, name) -> {
                 if (currentSets.containsKey(id)) {
                     if (currentSets.get(id).equals(name))
                         return;
+                    setRepository.deleteById(id);
                     setRepository.save(new NameSet(id, name));
-                    setTemplate.sendDefault(new NameSetDto(id, name, Operation.UPDATE));
+                    setTemplate.send("set-topic", id, new NameSetDto(id, name, Operation.UPDATE));
                 } else {
                     setRepository.save(new NameSet(id, name));
-                    setTemplate.sendDefault(new NameSetDto(id, name, Operation.CREATE));
+                    setTemplate.send("set-topic", id, new NameSetDto(id, name, Operation.CREATE));
                 }
             });
             currentSets.keySet().forEach(id -> {
                 if (!futureSets.containsKey(id)) {
                     setRepository.deleteById(id);
-                    setTemplate.sendDefault(new NameSetDto(id, null, Operation.DELETE));
+                    setTemplate.send("set-topic", id, new NameSetDto(id, null, Operation.DELETE));
                 }
             });
         }, throwable -> {
@@ -92,7 +94,7 @@ public class ArxivService {
                     return;
                 }
                 ArxivArticleHelper.getArticles(result).forEach(articleDto -> {
-                    articleTemplate.sendDefault(articleDto);
+                    articleTemplate.send("article-topic", articleDto.getId(), articleDto);
                 });
             }, throwable -> {
                 log.error("Error during daily articles fetch", throwable);

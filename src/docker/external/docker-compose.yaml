@@ -5,11 +5,11 @@ services:
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: "79e50284-0d7c-409a-92fa-4316c6f5fd8d"
     ports:
-      - "8200:8200"
+      - 8200:8200
 
   postgres:
     container_name: Postgres
-    image: postgres
+    image: postgres:17
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
@@ -51,7 +51,7 @@ services:
       - 4040:4040
       - 4317:4317
       - 4318:4318
-      - 9090:9090
+      - 9091:9090
 
 
 networks:

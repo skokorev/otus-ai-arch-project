@@ -1,20 +1,20 @@
 package ru.yahoondex.archhelper.recommendations.controllers.rest;
 
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yahoondex.archhelper.recommendations.services.RecommendationService;
 
 @RestController
 @RequestMapping("/")
 public class TestController {
-    private final ChatClient chatClient;
+    private final RecommendationService recommendationService;
     @Autowired
-    public TestController(ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public TestController(RecommendationService recommendationService) {
+        this.recommendationService = recommendationService;
     }
 
-    @GetMapping
-    public String dummyResponse() {
-        return chatClient.prompt("Группа 111").call().content();
+    @PostMapping
+    public void generate() {
+        recommendationService.generateRecommendations();
     }
 }

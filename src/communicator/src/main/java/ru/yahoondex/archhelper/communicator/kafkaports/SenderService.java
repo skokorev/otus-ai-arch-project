@@ -46,12 +46,13 @@ public class SenderService {
     record Recommendation(String url, String title) {}
     record RecommendationSet(String name, List<Recommendation> recs) {}
 
-    @KafkaListener(topics = {"article-topic"},
+    @KafkaListener(topics = {"recommendation-topic"},
             groupId = "mail-sender",
             containerFactory = "recommendationListenerContainerFactory"
     )
     @Transactional
     public void sendRecommendations(RecommendationListDto recommendation) {
+        log.info("Recommendation: {}", recommendation);
         List<RecommendationSet> recommendationSets = new LinkedList<>();
 
         recommendation.getRecommendations().forEach((setId, recommendationsList) -> {

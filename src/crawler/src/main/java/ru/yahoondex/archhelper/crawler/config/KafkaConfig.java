@@ -28,12 +28,14 @@ public class KafkaConfig {
     private String bootstrapServers;
 
     private ConsumerFactory<String, GroupDto> groupConsumerFactory() {
+        JacksonJsonDeserializer<GroupDto> deserializer = new JacksonJsonDeserializer<>();
+        deserializer.addTrustedPackages("ru.yahoondex.archhelper.commons.contracts.kafka");
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 bootstrapServers);
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                new JacksonJsonDeserializer<>());
+                deserializer);
     }
 
     @Bean

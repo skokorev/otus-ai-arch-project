@@ -35,12 +35,12 @@ public class UserGroupListener {
         List<String> groupsToRemove = new LinkedList<>();
         currentGroupIds.stream().forEach(currentGroupId -> {
             if (futureGroupIds.stream().noneMatch(currentGroupId::equals)) {
-                groupsToAdd.add(currentGroupId);
+                groupsToRemove.add(currentGroupId);
             }
         });
         futureGroupIds.stream().forEach(futureGroupId -> {
             if (currentGroupIds.stream().noneMatch(futureGroupId::equals)) {
-                groupsToRemove.add(futureGroupId);
+                groupsToAdd.add(futureGroupId);
             }
         });
         groupsToRemove.forEach(groupId -> usersRepository.deleteById(new UserGroupId(user.getEmail(), groupId)));

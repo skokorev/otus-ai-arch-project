@@ -13,6 +13,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import ru.yahoondex.archhelper.commons.contracts.kafka.ArticleDto;
 import ru.yahoondex.archhelper.commons.contracts.kafka.GroupDto;
 import ru.yahoondex.archhelper.commons.contracts.kafka.NameSetDto;
@@ -39,35 +40,41 @@ public class KafkaConfig {
           StringSerializer.class);
         configProps.put(
           ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-          JacksonJsonDeserializer.class);
+          JacksonJsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
     private ConsumerFactory<String, GroupDto> groupConsumerFactory() {
+        JacksonJsonDeserializer<GroupDto> deserializer = new JacksonJsonDeserializer<>();
+        deserializer.addTrustedPackages("ru.yahoondex.archhelper.commons.contracts.kafka");
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 bootstrapServers);
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                new JacksonJsonDeserializer<>());
+                deserializer);
     }
 
     private ConsumerFactory<String, NameSetDto> nameSetConsumerFactory() {
+        JacksonJsonDeserializer<NameSetDto> deserializer = new JacksonJsonDeserializer<>();
+        deserializer.addTrustedPackages("ru.yahoondex.archhelper.commons.contracts.kafka");
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 bootstrapServers);
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                new JacksonJsonDeserializer<>());
+                deserializer);
     }
 
     private ConsumerFactory<String, ArticleDto> articleConsumerFactory() {
+        JacksonJsonDeserializer<ArticleDto> deserializer = new JacksonJsonDeserializer<>();
+        deserializer.addTrustedPackages("ru.yahoondex.archhelper.commons.contracts.kafka");
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 bootstrapServers);
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                new JacksonJsonDeserializer<>());
+                deserializer);
     }
 
     @Bean

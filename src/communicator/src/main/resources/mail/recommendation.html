@@ -10,7 +10,7 @@
     <h3 th:text="${set.name}" />
     <ul>
         <div th:each="rec : ${set.recs}">
-            <a th:href="${rec.url}"><li th:text="rec.title" /></a>
+            <a th:href="${rec.url}"><li th:text="${rec.title}" /></a>
         </div>
 
     </ul>

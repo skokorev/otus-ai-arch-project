@@ -35,8 +35,8 @@ public class ArxivClient {
     }
 
     public Mono<String> getAllSets() {
-        return client.get()
-                .attribute("verb", "ListSets")
+        return client.get().uri(uriBuilder ->
+                        uriBuilder.queryParam("verb", "ListSets").build())
                 .exchangeToMono(clientResponse -> {
             if (clientResponse.statusCode().equals(HttpStatus.OK))
                 return clientResponse.bodyToMono(String.class);
@@ -46,14 +46,15 @@ public class ArxivClient {
     }
 
     public Mono<String> getArticlesForPeriod(String set, LocalDate from, LocalDate to) {
-        return client.get()
-                .attributes(params -> {
-                    params.put("verb", "ListRecords");
-                    params.put("metadataPrefix", "arXiv");
-                    params.put("set", set);
-                    params.put("from", from.format(dateFormatter));
-                    params.put("until", to.format(dateFormatter));
-                }).exchangeToMono(clientResponse -> {
+        return client.get().uri(uriBuilder -> uriBuilder
+                                .queryParam("verb", "ListRecords")
+                                .queryParam("metadataPrefix", "arXiv")
+                                .queryParam("set", set)
+                                .queryParam("from", from.format(dateFormatter))
+                                .queryParam("until", to.format(dateFormatter))
+                                .build()
+                )
+                .exchangeToMono(clientResponse -> {
                     if (clientResponse.statusCode().equals(HttpStatus.OK))
                         return clientResponse.bodyToMono(String.class);
                     else

@@ -79,7 +79,7 @@ public class RecommendationService {
             });
             RecommendationListDto recommendationListDto =
                     new RecommendationListDto(groupId, recommendations);
-            recommendationsKafkaTemplate.sendDefault(recommendationListDto);
+            recommendationsKafkaTemplate.send("recommendation-topic", groupId, recommendationListDto);
         });
 
     }
