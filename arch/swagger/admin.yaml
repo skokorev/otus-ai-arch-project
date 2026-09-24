@@ -1,0 +1,378 @@
+openapi: 3.0.4
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: |-
+    API проекта "Помощник архитектора" компании Яхундекс
+
+    Ссылка на репозиторий [репозиторий](https://github.com/skokorev/otus-ai-arch-project)
+
+  termsOfService: https://swagger.io/terms/
+  contact:
+    email: skokorev@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.12
+servers:
+  - url: https://archhelper.yahoondex.ru/admin
+tags:
+  # - name: set
+  #   description: Наборы ArXiv
+  #   externalDocs:
+  #     description: Инфо
+  #     url: https://info.arxiv.org/help/oa/index.html
+  - name: group
+    description: Группы пользователей
+paths:
+  /groups:
+    get:
+      tags:
+        - group
+      summary: Получение списка групп
+      description: Получение списка групп
+      operationId: getGroup
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupLite'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+    post:
+      tags:
+        - group
+      summary: Создание группы
+      description: Создание группы
+      operationId: createGroup
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+    put:
+      tags:
+        - group
+      summary: Переименование группы
+      description: Переименование группы
+      operationId: updateGroupName
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+  /groups/{id}:
+    get:
+      tags:
+        - group
+      summary: Получение информации по группе
+      description: Получение информации по группе
+      operationId: groupGroupById
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid 
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+    delete:
+      tags:
+        - group
+      summary: Удаление группы
+      description: Удаление группы
+      operationId: deleteGroup
+      parameters: 
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid 
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+  /groups/{id}/set:
+    post:
+      tags:
+        - group
+      summary: Добавление набора в группу
+      description: Добавление набора в группу
+      operationId: addSetToGroup
+      parameters: 
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid 
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                setId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+  /groups/{id}/set/{setId}:
+    delete:
+      tags:
+        - group
+      summary: Удаление набора из группы
+      description: Удаление набора из группы
+      operationId: deleteSetFromGroup
+      parameters: 
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid 
+        - name: setId
+          in: path
+          description: Идентификатор набора
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+  /groups/{id}/users:
+    post:
+      tags:
+        - group
+      summary: Добавление пользователя в группу
+      description: Добавление пользователя в группу
+      operationId: addUserToGroup
+      parameters: 
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid 
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                setId:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+  /groups/{id}/users/{user}:
+    delete:
+      tags:
+        - group
+      summary: Исключение пользователя из группы
+      description: Исключение пользователя из группы
+      operationId: deleteUserToGroup
+      parameters: 
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid 
+        - name: user
+          in: path
+          description: Почтовый адрес пользователя
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
+components:
+  schemas:
+    GroupLite:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "61B6B85C-81E4-484F-9ABF-1F404F5C3710"
+        name:
+          type: string
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "61B6B85C-81E4-484F-9ABF-1F404F5C3710"
+        name:
+          type: string
+        setIds:
+          type: array
+          items:
+            type: string
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  securitySchemes:
+    admin_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://archhelper.yahoondex.ru/admin/oauth/authorize
+          scopes:
+            "admin:admin": Любые изменения в админке
