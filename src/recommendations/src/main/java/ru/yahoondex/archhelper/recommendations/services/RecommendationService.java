@@ -1,7 +1,10 @@
 package ru.yahoondex.archhelper.recommendations.services;
 
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
@@ -11,16 +14,14 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import ru.yahoondex.archhelper.commons.contracts.kafka.RecommendationDto;
 import ru.yahoondex.archhelper.commons.contracts.kafka.RecommendationListDto;
 import ru.yahoondex.archhelper.recommendations.ai.tools.RecommendationItem;
 import ru.yahoondex.archhelper.recommendations.repositories.GroupSetRepository;
 import ru.yahoondex.archhelper.recommendations.repositories.dao.GroupSet;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -44,7 +45,7 @@ public class RecommendationService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "0 0 3 * * MON")
     public void generateRecommendations() {
         final StTemplateRenderer renderer = StTemplateRenderer.builder().build();
         final List<GroupSet> groupSets = groupSetRepository.findAll();

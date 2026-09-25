@@ -1,0 +1,79 @@
+@startuml
+title "Схема успешной работы помощника архитектора"
+
+actor Администратор as admin
+actor Пользователь as user
+participant configurator as conf
+participant communicator as comm
+participant recommendation as rec
+participant crawler as crw
+participant ArXiv as arxiv
+participant "AI Provider" as ai
+participant "Mail Server" as mail
+
+== Наполнение наборов ==
+crw -> arxiv : Получение наборов \n GET https://oaipmh.arxiv.org/oai?verb=ListSets \n Backoff 3 раза через 3 секунды, случайная задержка 0.5 \n в полночь по понедельникам
+arxiv --> crw : Наборы
+crw -> crw : Сохранение наборов
+group Асинхронное распространение
+    crw -/ conf : Отправка изменений в наборах
+    crw -/ rec : Отправка изменений в наборах
+    crw -/ comm : Отправка изменений в наборах
+end
+
+== Конфигурирование ==
+admin -> conf : Создание группы \n POST /groups
+conf --> admin : Id группы
+group Асинхронное распространение
+    conf -/ crw : Отправка изменений в группах
+    conf -/ rec : Отправка изменений в группах
+end
+
+admin -> conf : Добавление набора в группу \n POST /groups/{id}/set
+conf --> admin : Успех добавления
+group Асинхронное распространение
+    conf -/ crw : Отправка изменений в группах
+    conf -/ rec : Отправка изменений в группах
+end
+
+user -> admin : Добавь меня в группу
+admin -> conf : Добавление пользователя в группу \n POST /groups/{id}/users
+conf --> admin : Успех добавления
+group Асинхронное распространение
+    conf -/ comm : Отправка аудитории групп
+end
+
+== Наполнение статей ==
+loop Активные наборы
+    crw -> arxiv : Получение статей по активным наборам \n GET https://oaipmh.arxiv.org/oai?verb=ListRecords&metadataPrefix=arXiv&set=<Набор>&from=<Текущая дата - 8 суток>&until=<Текущая дата - сутки> \n Backoff 3 раза через 3 секунды, случайная задержка 0.5 \n в полночь ежедневно
+    arxiv --> crw : Статьи
+    group Асинхронное распространение
+        crw -/ rec : Отправка собранных статей
+    end
+end
+
+== Выработка рекомендаций ==
+loop Группы с пользователями
+    rec -> rec : Формирование запроса в провайдер AI-вывода
+    rec -> ai : Вызов модели
+    ai -> rec : Вызов tool-а списка наборов для группы
+    rec --> ai : Наборы
+    ai -> rec : Вызов tool-а выборки последних статей
+    rec --> ai : Статьи
+    ai --> rec : Выбор статей для группы
+    group Асинхронное распространение
+        rec -/ comm : Отправка рекомендаций для группы за неделю
+    end
+end
+note right
+В 3 часа ночи по понедельникам, без повторов
+end note
+
+== Отправка рекомендаций ==
+comm -> comm : Создание письма с рекомендациями
+loop Пользователи в группе
+    comm -> mail : Отправка письма пользователю
+end
+mail --> comm : Письмо принято
+mail -/ user : Письмо с рекомендациями
+@enduml
