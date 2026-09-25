@@ -16,14 +16,37 @@ info:
 servers:
   - url: https://archhelper.yahoondex.ru/admin
 tags:
-  # - name: set
-  #   description: Наборы ArXiv
-  #   externalDocs:
-  #     description: Инфо
-  #     url: https://info.arxiv.org/help/oa/index.html
+  - name: set
+    description: Наборы ArXiv
+    externalDocs:
+      description: Инфо
+      url: https://info.arxiv.org/help/oa/index.html
   - name: group
     description: Группы пользователей
 paths:
+  /sets:
+    get:
+      tags:
+        - set
+      summary: Получение списка наборов
+      description: Получение списка наборов
+      operationId: getSets
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Set'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
   /groups:
     get:
       tags:
@@ -64,6 +87,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupId"
         default:
           description: Unexpected error
           content:
@@ -93,6 +120,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupId"
         default:
           description: Unexpected error
           content:
@@ -194,6 +225,7 @@ paths:
               properties:
                 setId:
                   type: string
+                  description: Идентификатор набора
       responses:
         '200':
           description: successful operation
@@ -252,6 +284,42 @@ paths:
         - admin_auth:
             - admin:admin
   /groups/{id}/users:
+    get:
+      tags:
+        - group
+      summary: Получение списка пользователей группы
+      description: Получение списка пользователей группы
+      operationId: getUsersByGroup
+      parameters: 
+        - name: id
+          in: path
+          description: Идентификатор группы
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Users'
+        '404':
+            description: not found
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - admin_auth:
+            - admin:admin
     post:
       tags:
         - group
@@ -357,6 +425,27 @@ components:
           type: array
           items:
             type: string
+    Set:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "CS:cs"
+        name:
+          type: string
+          example: "Computer science"
+    GroupId:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+          example: "61B6B85C-81E4-484F-9ABF-1F404F5C3710"
+    Users:
+      type: array
+      items:
+        type: string
+        format: email
     Error:
       type: object
       properties:
