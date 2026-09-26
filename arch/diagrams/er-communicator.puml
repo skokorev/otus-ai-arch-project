@@ -1,0 +1,13 @@
+@startuml
+title "ER-диаграмма БД сервиса communicator"
+entity "UserGroup" {
+    * email : VARCHAR
+    * group_id : VARCHAR
+}
+
+entity "Sets" {
+    * id : VARCHAR
+    --
+    name : VARCHAR
+}
+@enduml

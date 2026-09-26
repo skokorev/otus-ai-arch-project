@@ -1,0 +1,28 @@
+@startuml
+title "ER-диаграмма БД сервиса recommendations"
+skinparam linetype ortho
+entity "Sets" {
+    * id : VARCHAR
+    --
+    name : VARCHAR
+}
+entity "Articles" {
+    * id : VARCHAR
+    --
+    published : DATE
+    abstract : TEXT
+    title : TEXT
+}
+entity "ArticleSetMapping" {
+    * article_id : VARCHAR
+    * set_id : VARCHAR
+}
+entity "GroupSets" {
+    * group_id : VARCHAR
+    * set_id: VARCHAR
+}
+
+Sets ||--o{ ArticleSetMapping
+Articles ||--o{ ArticleSetMapping
+Sets ||--o{ GroupSets
+@enduml

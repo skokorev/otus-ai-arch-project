@@ -1,0 +1,13 @@
+@startuml
+title "ER-диаграмма БД сервиса crawler"
+entity "Sets" {
+    * id : VARCHAR
+    --
+    name : VARCHAR
+}
+entity "GroupSets" {
+    * group_id : VARCHAR
+    * set_id: VARCHAR
+}
+Sets ||--o{ GroupSets
+@enduml

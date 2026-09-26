@@ -1,0 +1,26 @@
+@startuml
+title "ER-диаграмма БД сервиса configurator"
+skinparam linetype ortho
+entity "Sets" {
+    * id : VARCHAR
+    --
+    name : VARCHAR
+}
+entity "Groups" {
+    * id : VARCHAR
+    --
+    name : VARCHAR
+}
+entity "UserGroupMapping" {
+    * group_id : VARCHAR
+    * email : VARCHAR
+}
+entity "GroupSets" {
+    * group_id : VARCHAR
+    * set_id: VARCHAR
+}
+
+Sets ||--o{ GroupSets
+Groups ||--o{ GroupSets
+Groups ||--o{ UserGroupMapping
+@enduml
