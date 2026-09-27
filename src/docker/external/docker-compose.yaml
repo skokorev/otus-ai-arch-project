@@ -52,10 +52,20 @@ services:
       - 4317:4317
       - 4318:4318
       - 9091:9090
+    networks:
+      - grafana-network
 
+  langfuse:
+    image: langfuse/langfuse:4.46.0
+    ports:
+      - 3031:3000
+    networks:
+      - grafana-network
 
 networks:
   keycloak-network:
+    driver: bridge
+  grafana-network:
     driver: bridge
 
 volumes:

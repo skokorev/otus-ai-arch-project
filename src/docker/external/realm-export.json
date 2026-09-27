@@ -64,7 +64,11 @@
         "composite": false,
         "clientRole": false,
         "containerId": "f9973601-5264-4e87-9a26-2dc9c4bb312e",
-        "attributes": {}
+        "attributes": {
+          "yahoondex-user": [
+            "true"
+          ]
+        }
       },
       {
         "id": "0f8ad435-b220-4469-bd96-e9a5407d9532",
@@ -524,6 +528,12 @@
       "roles": [
         "offline_access"
       ]
+    },
+    {
+      "clientScope": "yahoondex_roles",
+      "roles": [
+        "yahoondex-arch-helper-admin"
+      ]
     }
   ],
   "clientScopeMappings": {
@@ -729,11 +739,29 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "d860086e-ff11-4020-8d4e-dfd1e1ebdff1",
+          "name": "client roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "foo",
+            "introspection.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "resource_access.${client_id}.roles",
+            "jsonType.label": "String",
+            "multivalued": "true"
+          }
+        }
+      ],
       "defaultClientScopes": [
         "web-origins",
         "acr",
         "roles",
         "profile",
+        "yahoondex_roles",
         "basic",
         "email"
       ],
@@ -1500,6 +1528,32 @@
       ]
     },
     {
+      "id": "2b5ccb31-92ba-4461-9907-1c5544fb4cd2",
+      "name": "yahoondex_roles",
+      "description": "Роли в yahoondex",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "gui.order": "",
+        "consent.screen.text": "",
+        "include.in.openid.provider.metadata": "true"
+      },
+      "protocolMappers": [
+        {
+          "id": "dd517774-7e37-4145-b31c-a46ce86cf066",
+          "name": "yahoondex_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-claims-param-token-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
       "id": "a735d61b-c079-47d0-b36d-b80a02864681",
       "name": "AuthnContextClassRef",
       "description": "AuthnContextClassRef Level of Authentiation",
@@ -1605,7 +1659,8 @@
     "roles",
     "web-origins",
     "acr",
-    "basic"
+    "basic",
+    "yahoondex_roles"
   ],
   "defaultOptionalClientScopes": [
     "offline_access",

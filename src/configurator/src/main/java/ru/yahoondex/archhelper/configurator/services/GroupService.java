@@ -17,8 +17,8 @@ import ru.yahoondex.archhelper.configurator.repositories.dao.GroupSetId;
 import ru.yahoondex.archhelper.configurator.repositories.dao.UserGroup;
 import ru.yahoondex.archhelper.configurator.repositories.dao.UserGroupId;
 import ru.yahoondex.archhelper.configurator.services.dto.GroupLite;
+import ru.yahoondex.archhelper.configurator.services.dto.GroupCreationReport;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -61,11 +61,12 @@ public class GroupService {
     }
 
     @Transactional
-    public void createGroup(String name) {
+    public GroupCreationReport createGroup(String name) {
         final String id = UUID.randomUUID().toString();
         ru.yahoondex.archhelper.configurator.repositories.dao.Group group = new ru.yahoondex.archhelper.configurator.repositories.dao.Group(id, name);
         groupRepository.save(group);
         groupTemplate.send("group-topic", id, new GroupDto(id, name, new String[]{}, Operation.CREATE));
+        return new GroupCreationReport(id);
     }
 
     @Transactional

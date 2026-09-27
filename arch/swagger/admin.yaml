@@ -14,7 +14,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.12
 servers:
-  - url: https://archhelper.yahoondex.ru/admin
+  - url: https://localhost:8080/admin
 tags:
   - name: set
     description: Наборы ArXiv
@@ -461,6 +461,6 @@ components:
       type: oauth2
       flows:
         implicit:
-          authorizationUrl: https://archhelper.yahoondex.ru/admin/oauth/authorize
+          authorizationUrl: http://localhost:9090/oauth2/authorization/keycloak
           scopes:
             "admin:admin": Любые изменения в админке
