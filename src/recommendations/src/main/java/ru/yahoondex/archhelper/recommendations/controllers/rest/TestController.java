@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yahoondex.archhelper.recommendations.services.RecommendationService;
 
+/*
+Will not expose port from container, only for manual testing purposes
+ */
 @RestController
 @RequestMapping("/")
 public class TestController {

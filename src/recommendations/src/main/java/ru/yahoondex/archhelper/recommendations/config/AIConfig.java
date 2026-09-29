@@ -11,10 +11,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.FileCopyUtils;
 import ru.yahoondex.archhelper.recommendations.ai.tools.CustomTools;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -50,10 +54,14 @@ public class AIConfig {
 
     @Bean
     public ChatClient chatClient(ChatModel yandexChatModel) throws IOException {
-        final String systemPrompt = Files.readString(systemPromptFile.getFilePath(), StandardCharsets.UTF_8);
-        return ChatClient.builder(yandexChatModel)
-                .defaultTools(customTools)
-                .defaultSystem(systemPrompt)
-                .build();
+        try (InputStream is = systemPromptFile.getInputStream();
+             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+
+            final String systemPrompt = FileCopyUtils.copyToString(reader);
+            return ChatClient.builder(yandexChatModel)
+                    .defaultTools(customTools)
+                    .defaultSystem(systemPrompt)
+                    .build();
+        }
     }
 }

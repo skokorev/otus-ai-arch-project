@@ -20,6 +20,8 @@
 		<maven.compiler.source>19</maven.compiler.source>
 		<maven.compiler.target>19</maven.compiler.target>
 		<spring-cloud.version>2025.1.3</spring-cloud.version>
+		<application.system-name>recommendations</application.system-name>
+		<application.main.class>ru.yahoondex.archhelper.recommendations.Application</application.main.class>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -132,6 +134,7 @@
 	</dependencyManagement>
 
 	<build>
+		<finalName>${application.system-name}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -142,6 +145,74 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.15.0</version>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.49.0</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>stop</goal>
+							<goal>remove</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>build-release</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+						<configuration>
+							<images>
+								<image>
+									<name>yahoondex/archhelper-${application.system-name}:%v</name>
+									<build>
+										<dockerFile>${project.basedir}/Dockerfile</dockerFile>
+										<tags>
+											<tag>latest</tag>
+										</tags>
+									</build>
+								</image>
+							</images>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

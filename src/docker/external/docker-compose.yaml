@@ -1,14 +1,18 @@
 services:
   vault:
-    container_name: "dev-vault"
+    container_name: dev-vault
     image: hashicorp/vault:2.1.1
+    hostname: vaulthost
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: "79e50284-0d7c-409a-92fa-4316c6f5fd8d"
+    networks:
+      - shared
     ports:
       - 8200:8200
 
   postgres:
     container_name: Postgres
+    hostname: extpg
     image: postgres:17
     environment:
       POSTGRES_USER: root
@@ -19,32 +23,40 @@ services:
     ports:
       - 5435:5432
     networks:
-      - keycloak-network
+      - shared
     restart: unless-stopped
 
   keycloak:
     container_name: Keycloak
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.7
+    hostname: keycloak
     ports:
       - 9090:8080
     environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABASE: keycloak
-      DB_SCHEMA: public
-      DB_USER: root
-      DB_PASSWORD: root
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: root
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_DEBUG: true
+    volumes:
+      - ./kc-imports:/opt/keycloak/data/import
     networks:
-      - keycloak-network
+      - shared
     depends_on:
       - postgres
     command:
       - "start-dev"
+      - "--verbose"
+      - "--import-realm"
 
   grafana-lgtm:
     image: grafana/otel-lgtm:0.33.1
+    hostname: grafana
     ports:
       - 3000:3000
       - 3200:3200
@@ -53,20 +65,13 @@ services:
       - 4318:4318
       - 9091:9090
     networks:
-      - grafana-network
-
-  langfuse:
-    image: langfuse/langfuse:4.46.0
-    ports:
-      - 3031:3000
-    networks:
-      - grafana-network
+      - shared
 
 networks:
-  keycloak-network:
+  shared:
+    name: shared
     driver: bridge
-  grafana-network:
-    driver: bridge
+    external: true
 
 volumes:
   postgres_data:
