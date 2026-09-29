@@ -31,4 +31,43 @@
 ## Важные примечания и "Срезанные углы"
 1. Используются данные ArXiv, по этому поводу: "Thank you to arXiv for use of its open access interoperability."
 2. Так как подразумевается использование корпоративной инфраструктуры Yahoondex, в развёртывании это отдельный docker-compose-файл.
-3. Настройка Vault по той же причине делается облегчённой, это же самое касается и настройки брокеров и отсутствию TLS между администратором системы и api.
+3. Настройка Vault по той же причине делается облегчённой, это же самое касается и настройки брокеров и отсутствию TLS между администратором системы и api. Корпоративные ресурсы Яхундекс также заменяются облегчёнными в настройке компонентами.
+
+
+
+## Инструкция по сборке
+1. Предварительное требование: установлен JDK 21+ (и присутствие её в PATH на месте, обеспечивающем запуск именно этой версии из командной строки без дополнительных аргументов и настроек)
+2. Предварительное требование: установлен Maven 3 (и присутствие системных переменных M2_HOME, указывающей на основную директорию установки maven + присутствие в PATH директории $M2_HOME/bin)
+3. Предварительное требование: установлен и запущен Docker 4.90+
+4. Предварительное требование: создана системная переменная с именем VAULT_TOKEN и значением 79e50284-0d7c-409a-92fa-4316c6f5fd8d (см. "Срезанные углы", п.3)
+5. Склонировать репозиторий проекта git clone https://github.com/skokorev/otus-ai-arch-project.git
+6. Перейти в директорию otus-ai-arch-project и запустить оттуда команду mvn clean install
+
+## Инструкция по запуску
+1. Перейти в директории проекта в /src/docker/external и запустить внешние ресурсы командой docker compose up -d
+2. Настроить секреты проекта в vault:
+2.1. Запустить команду docker exec -it dev-vault sh
+2.2. В контейнере dev-vault запустить команду
+   export VAULT_TOKEN="79e50284-0d7c-409a-92fa-4316c6f5fd8d" \
+   export VAULT_ADDR="http://127.0.0.1:8200"
+2.3 В контейнере dev-vault запустить команды (заполнив заранее подстановки)
+   vault kv put secret/configurator configurator.postgresUser=admin configurator.postgresPassword=mysecretpassword configurator.clientSecret=xlC1mfbakPelkKJuCSoSXjMeWUeAMFKcDbYE8EZyqwCCj225KGYTVQ6sVsfqjov9W4AOu09KA5MusVuSdrYi7b
+   vault kv put secret/communicator communicator.postgresUser=admin communicator.postgresPassword=mysecretpassword communicator.mailLogin=<логин в gmail>@gmail.com communicator.mailPassword="<Машинный код в gmail>"
+   vault kv put secret/crawler crawler.postgresUser=admin crawler.postgresPassword=mysecretpassword
+   vault kv put secret/recommendation recommendations.postgresUser=admin recommendations.postgresPassword=mysecretpassword recommendations.yandexFolder=<название папки модели из yandex ai studio> recommendations.yandexToken=<токен yandex ai studio>
+   exit 
+3. Настроить keycloak:
+3.1. Открыть в браузере адрес http://localhost:9090 (см. "Срезанные углы", п.3), выполнить вход, с логином admin и паролем admin
+3.2. Выбрать realm yahoonex-arch-helper
+3.3. Создать пользователя admin с любым подтверждённым паролем, включить в группу admins
+3.4. Установить secret для client в значение xlC1mfbakPelkKJuCSoSXjMeWUeAMFKcDbYE8EZyqwCCj225KGYTVQ6sVsfqjov9W4AOu09KA5MusVuSdrYi7b
+4. Зайти в проекте в директорию /src/docker и запустить основные сервисы системы командой docker compose up -d
+5. Подождать до утра ближайшего понедельника, в проекте появятся наборы статей по интересам (либо вызвать закрытые методы краулера изнутри соответствующего контейнера)
+6. Получить токен jwt для запуска методов бэкенда вызовом метода vault POST http://localhost:9090/realms/yahoonex-arch-helper/protocol/openid-connect/token c параметрами в x-www-form-urlencoded:
+    - grant_type = password
+    - password = <пароль с шага 3.3.>
+7. Используя полученный токен для авторизации дальнейших действий (Authorization: Bearer token), согласно спецификации OpenAPI:
+    - Создать группу POST http://localhost:8080/admin/groups, получить id группы (имя задаётся в form-data name)
+    - Назначить набор или несколько последовательными вызовами POST http://localhost:8080/admin/groups/<id группы с предыдущего шага> (набор задаётся в form-data setId)
+    - Добавить почтовый адрес получателя в группу вызовом POST http://localhost:8080/admin/groups/<id группы с предыдущего шага>/users (получатель задаётся в form-data email)
+8. Дождаться следующего понедельника и получить на указанных почтовых адресах рассылку с интересными статьями.
