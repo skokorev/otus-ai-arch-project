@@ -44,8 +44,9 @@
 6. Перейти в директорию otus-ai-arch-project и запустить оттуда команду ```mvn clean install```
 
 ## Инструкция по запуску
-1. Перейти в директории проекта в /src/docker/external и запустить внешние ресурсы командой ```docker compose up -d```
-2. Настроить секреты проекта в vault:
+1. Создать сеть командой ```docker network create shared```
+2. Перейти в директории проекта в /src/docker/external и запустить внешние ресурсы командой ```docker compose up -d```
+3. Настроить секреты проекта в vault:
 - Запустить команду ```docker exec -it dev-vault sh```
   - В контейнере dev-vault запустить команду
      ```
@@ -60,18 +61,18 @@
      vault kv put secret/recommendation recommendations.postgresUser=admin recommendations.postgresPassword=mysecretpassword recommendations.yandexFolder=<название папки модели из yandex ai studio> recommendations.yandexToken=<токен yandex ai studio>
      exit
     ``` 
-3. Настроить keycloak:
+4. Настроить keycloak:
 - Открыть в браузере адрес http://localhost:9090 (см. "Срезанные углы", п.3), выполнить вход, с логином admin и паролем admin
 - Выбрать realm yahoonex-arch-helper
 - Создать пользователя admin с любым подтверждённым паролем, включить в группу admins
 - Установить secret для client в значение xlC1mfbakPelkKJuCSoSXjMeWUeAMFKcDbYE8EZyqwCCj225KGYTVQ6sVsfqjov9W4AOu09KA5MusVuSdrYi7b
-4. Зайти в проекте в директорию /src/docker и запустить основные сервисы системы командой ```docker compose up -d```
-5. Подождать до утра ближайшего понедельника, в проекте появятся наборы статей по интересам (либо вызвать закрытые методы краулера изнутри соответствующего контейнера)
-6. Получить токен jwt для запуска методов бэкенда вызовом метода vault ```POST http://localhost:9090/realms/yahoonex-arch-helper/protocol/openid-connect/token``` c параметрами в x-www-form-urlencoded:
+5. Зайти в проекте в директорию /src/docker и запустить основные сервисы системы командой ```docker compose up -d```
+6. Подождать до утра ближайшего понедельника, в проекте появятся наборы статей по интересам (либо вызвать закрытые методы краулера изнутри соответствующего контейнера)
+7. Получить токен jwt для запуска методов бэкенда вызовом метода vault ```POST http://localhost:9090/realms/yahoonex-arch-helper/protocol/openid-connect/token``` c параметрами в x-www-form-urlencoded:
     - grant_type = password
-    - password = <пароль с третьего пункта шага 3>
-7. Используя полученный токен для авторизации дальнейших действий (Authorization: Bearer token), согласно спецификации OpenAPI:
+    - password = <пароль с третьего пункта шага 4>
+8. Используя полученный токен для авторизации дальнейших действий (Authorization: Bearer token), согласно спецификации OpenAPI:
     - Создать группу ```POST http://localhost:8080/admin/groups```, получить id группы (имя задаётся в form-data name)
     - Назначить набор или несколько последовательными вызовами ```POST http://localhost:8080/admin/groups/<id группы с предыдущего шага>``` (набор задаётся в form-data setId)
     - Добавить почтовый адрес получателя в группу вызовом ```POST http://localhost:8080/admin/groups/<id группы с предыдущего шага>/users``` (получатель задаётся в form-data email)
-8. Дождаться следующего понедельника и получить на указанных почтовых адресах рассылку с интересными статьями.
+9. Дождаться следующего понедельника и получить на указанных почтовых адресах рассылку с интересными статьями.
